@@ -126,5 +126,5 @@ MIT License
 ---
 
 **开发者**：小欢  
-**邮箱**：836881606@qq.com  
+**邮箱**：522025360007@smail.nju.edu.com  
 **GitHub**：[Xiaohuan123123](https://github.com/Xiaohuan123123)
