@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>测试删除功能</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+    .pass { background: #d4edda; color: #155724; }
+    .fail { background: #f8d7da; color: #721c24; }
+    .info { background: #d1ecf1; color: #0c5460; }
+    button { margin: 5px; padding: 8px 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>🧪 知识图谱删除功能测试</h1>
+
+  <div id="test-output"></div>
+
+  <button onclick="runTests()">运行测试</button>
+  <button onclick="clearData()">清除测试数据</button>
+
+  <script src="js/storage.js"></script>
+  <script>
+    function log(msg, type) {
+      var div = document.createElement('div');
+      div.className = 'test-result ' + type;
+      div.textContent = msg;
+      document.getElementById('test-output').appendChild(div);
+    }
+
+    function clearData() {
+      localStorage.clear();
+      document.getElementById('test-output').innerHTML = '';
+      log('数据已清除', 'info');
+    }
+
+    function runTests() {
+      document.getElementById('test-output').innerHTML = '';
+      log('开始测试...', 'info');
+
+      // 测试1: 创建测试数据
+      log('测试1: 创建测试节点和边', 'info');
+      var testCards = [
+        { id: 'test-1', topic: '人工智能教育', domain: 'AI教育', level: 3, insight: 'AI在教育领域的应用', createdAt: new Date().toISOString() },
+        { id: 'test-2', topic: '深度学习', domain: 'AI', level: 4, insight: '神经网络的基础', createdAt: new Date().toISOString() },
+        { id: 'test-3', topic: '机器学习', domain: 'AI', level: 3, insight: '统计学习方法', createdAt: new Date().toISOString() },
+        { id: 'test-4', topic: '自然语言处理', domain: 'AI', level: 4, insight: '文本处理技术', createdAt: new Date().toISOString() }
+      ];
+
+      Storage.Echoes.save(testCards);
+      log('✓ 创建了 ' + testCards.length + ' 个测试节点', 'pass');
+
+      // 测试2: 创建测试边
+      log('测试2: 创建测试关联边', 'info');
+      var testEdges = [
+        { from: 'test-1', to: 'test-2', type: 'prerequisite', weight: 0.8, label: '前置', source: 'user' },
+        { from: 'test-1', to: 'test-3', type: 'associate', weight: 0.7, label: '关联', source: 'user' },
+        { from: 'test-2', to: 'test-4', type: 'deepen', weight: 0.9, label: '深入', source: 'user' }
+      ];
+
+      Storage.Graph.addEdges(testEdges);
+      log('✓ 创建了 ' + testEdges.length + ' 条测试边', 'pass');
+
+      // 验证数据
+      var cards = Storage.Echoes.load();
+      var edges = Storage.Graph.getEdges();
+      log('当前节点数: ' + cards.length + ', 边数: ' + edges.length, 'info');
+
+      // 测试3: 模拟多选删除
+      log('测试3: 模拟多选删除逻辑', 'info');
+
+      // 模拟选中节点 test-1 和边 [0, 1]
+      var selectedNodeIds = ['test-1'];
+      var selectedEdgeIndices = [0, 1]; // 前两条边
+
+      var removedEdges = [];
+      var deletedCards = [];
+
+      // 删除选中的边
+      if (selectedEdgeIndices.length > 0) {
+        var graph = Storage.Graph.load();
+        var sortedIndices = selectedEdgeIndices.slice().sort(function(a, b) { return b - a; });
+        sortedIndices.forEach(function(edgeIdx) {
+          if (edgeIdx >= 0 && edgeIdx < edges.length) {
+            var edge = edges[edgeIdx];
+            removedEdges.push(edge);
+            graph.edges.splice(edgeIdx, 1);
+          }
+        });
+        Storage.Graph.save(graph);
+        log('✓ 删除了 ' + selectedEdgeIndices.length + ' 条边', 'pass');
+      }
+
+      // 删除选中节点
+      if (selectedNodeIds.length > 0) {
+        var allCards = Storage.Echoes.load();
+        var idSet = {};
+        selectedNodeIds.forEach(function(id) { idSet[id] = true; });
+        deletedCards = allCards.filter(function(c) { return idSet[c.id]; });
+        var remainingCards = allCards.filter(function(c) { return !idSet[c.id]; });
+        Storage.Echoes.save(remainingCards);
+        log('✓ 删除了 ' + selectedNodeIds.length + ' 个节点', 'pass');
+      }
+
+      // 验证删除结果
+      var finalCards = Storage.Echoes.load();
+      var finalEdges = Storage.Graph.getEdges();
+      log('删除后 - 节点数: ' + finalCards.length + ', 边数: ' + finalEdges.length, 'info');
+
+      // 检查是否正确删除
+      if (finalCards.length === 3 && finalEdges.length === 1) {
+        log('✓ 删除功能测试通过！', 'pass');
+      } else {
+        log('✗ 删除功能测试失败！', 'fail');
+      }
+
+      // 测试4: 撤回功能
+      log('测试4: 测试撤回功能', 'info');
+
+      // 恢复删除的数据
+      deletedCards.forEach(function(card) {
+        Storage.Echoes.add(card);
+      });
+      Storage.Graph.addEdges(removedEdges);
+
+      var restoredCards = Storage.Echoes.load();
+      var restoredEdges = Storage.Graph.getEdges();
+      log('撤回后 - 节点数: ' + restoredCards.length + ', 边数: ' + restoredEdges.length, 'info');
+
+      if (restoredCards.length === 4 && restoredEdges.length === 3) {
+        log('✓ 撤回功能测试通过！', 'pass');
+      } else {
+        log('✗ 撤回功能测试失败！', 'fail');
+      }
+
+      log('测试完成！', 'info');
+    }
+  </script>
+</body>
+</html>
