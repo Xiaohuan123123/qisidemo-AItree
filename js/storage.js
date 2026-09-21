@@ -1,5 +1,5 @@
 /**
- * 栖思 demo 2.0 — 存储层
+ * 栖思 · 笔记整理工具 — 存储层
  * 封装 localStorage 读写 + 埋点模块
  */
 var Storage = (function() {
@@ -30,23 +30,22 @@ var Storage = (function() {
 
   // ===== 键名常量 =====
   var KEYS = {
-    CHAT_STATE: 'qisi2-chat-state',
-    ECHOES: 'qisi2-echoes',
-    PROFILE: 'qisi2-profile',
-    ONBOARDED: 'qisi2-onboarded',
-    THEME: 'qisi2-theme',
-    ANALYTICS: 'qisi2-analytics',
-    EVALUATE: 'qisi2-evaluate',
-    RECENT_CARDS: 'qisi2-recent-cards',
-    RECOMMEND: 'qisi2-recommend',
-    FOREST_RECOMMEND: 'qisi2-forest-recommend',
-    TRASH: 'qisi2-trash',
-    CUSTOM_DOMAINS: 'qisi2-custom-domains',
-    CARD_NOTES: 'qisi2-card-notes',
+    CHAT_STATE: 'qisi3-chat-state',
+    ECHOES: 'qisi3-echoes',
+    PROFILE: 'qisi3-profile',
+    ONBOARDED: 'qisi3-onboarded',
+    THEME: 'qisi3-theme',
+    ANALYTICS: 'qisi3-analytics',
+    TRASH: 'qisi3-trash',
+    CUSTOM_DOMAINS: 'qisi3-custom-domains',
+    CARD_NOTES: 'qisi3-card-notes',
+    NOTES: 'qisi3-notes',
+    ORGANIZE_SESSION: 'qisi3-organize-session',
+    REVIEWS: 'qisi3-reviews',
   };
 
   // ========================================================
-  //  ChatState — 聊天状态
+  //  ChatState — 对话状态（整理会话 / 复盘会话）
   // ========================================================
   var ChatState = {
     save: function(state) { _set(KEYS.CHAT_STATE, state); },
@@ -55,7 +54,7 @@ var Storage = (function() {
   };
 
   // ========================================================
-  //  Echoes — 回响卡片
+  //  Echoes — 知识点卡片
   // ========================================================
   var Echoes = {
     load: function() { return _get(KEYS.ECHOES) || []; },
@@ -66,6 +65,11 @@ var Storage = (function() {
       Echoes.save(arr);
       return card;
     },
+    addMany: function(cards) {
+      var arr = Echoes.load();
+      cards.forEach(function(c) { arr.push(c); });
+      Echoes.save(arr);
+    },
   };
 
   // ========================================================
@@ -75,13 +79,7 @@ var Storage = (function() {
     load: function() {
       return _get(KEYS.PROFILE) || {
         nickname: '',
-        school: '',
-        major: '',
-        grade: '',
-        courses: [],
-        goals: '',
-        style: '温和',
-        treeSpecies: '银杏',
+        defaultPurpose: '考前复习',
       };
     },
     save: function(profile) { _set(KEYS.PROFILE, profile); },
@@ -119,220 +117,150 @@ var Storage = (function() {
   };
 
   // ========================================================
-  //  RecentCards — 右侧面板最新卡片（独立于回响页）
+  //  Notes — 整理产出的笔记实体
   // ========================================================
-  var RecentCards = {
-    load: function() { return _get(KEYS.RECENT_CARDS) || []; },
-    save: function(arr) { _set(KEYS.RECENT_CARDS, arr); },
-    add: function(card) {
-      var arr = RecentCards.load();
-      arr.push(card);
-      if (arr.length > 50) arr = arr.slice(-50);
-      RecentCards.save(arr);
-      return card;
-    },
-    removeByIds: function(ids) {
-      var idSet = {};
-      ids.forEach(function(id) { idSet[id] = true; });
-      var arr = RecentCards.load().filter(function(c) { return !idSet[c.id]; });
-      RecentCards.save(arr);
-      return arr;
-    },
-    clear: function() { _remove(KEYS.RECENT_CARDS); },
-  };
+  var Notes = {
+    load: function() { return _get(KEYS.NOTES) || []; },
+    save: function(arr) { _set(KEYS.NOTES, arr); },
 
-  // ========================================================
-  //  Evaluate — 评价记录
-  // ========================================================
-  var Evaluate = {
-    // 保存一次评价结果
-    save: function(evalData) {
-      var arr = Evaluate.load();
-      arr.push(evalData);
-      // 只保留最近50条
-      if (arr.length > 50) arr = arr.slice(-50);
-      _set(KEYS.EVALUATE, arr);
-      return evalData;
+    add: function(note) {
+      var arr = Notes.load();
+      arr.push(note);
+      Notes.save(arr);
+      return note;
     },
 
-    // 加载全部评价历史
-    load: function() { return _get(KEYS.EVALUATE) || []; },
-
-    // 获取最新一次评价
-    getLatest: function() {
-      var arr = Evaluate.load();
-      return arr.length > 0 ? arr[arr.length - 1] : null;
-    },
-
-    // 清空所有评价记录
-    clear: function() { _remove(KEYS.EVALUATE); },
-
-    // 计算认知档案：各等级占比 + 4维度均值
-    getCognitiveProfile: function() {
-      var arr = Evaluate.load();
-      if (arr.length === 0) {
-        return { distribution: {1:0,2:0,3:0,4:0,5:0}, avgScores: {depth:0,purity:0,accuracy:0,coherence:0}, avgScore: 0, total: 0 };
+    get: function(id) {
+      var arr = Notes.load();
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i].id === id) return arr[i];
       }
-      var dist = {1:0,2:0,3:0,4:0,5:0};
-      var scoreSum = {depth:0, purity:0, accuracy:0, coherence:0};
-      var totalScoreSum = 0;
-      arr.forEach(function(e) {
-        var lv = Math.min(5, Math.max(1, e.level || 1));
-        dist[lv]++;
-        if (e.scores) {
-          scoreSum.depth     += (e.scores.depth     || 0);
-          scoreSum.purity    += (e.scores.purity    || 0);
-          scoreSum.accuracy  += (e.scores.accuracy  || 0);
-          scoreSum.coherence += (e.scores.coherence || 0);
+      return null;
+    },
+
+    update: function(id, patch) {
+      var arr = Notes.load();
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i].id === id) {
+          Object.assign(arr[i], patch);
+          Notes.save(arr);
+          return arr[i];
         }
-        totalScoreSum += (e.score || 0);
-      });
-      var n = arr.length;
-      return {
-        distribution: dist,
-        avgScores: {
-          depth:     Math.round(scoreSum.depth     / n),
-          purity:    Math.round(scoreSum.purity    / n),
-          accuracy:  Math.round(scoreSum.accuracy  / n),
-          coherence: Math.round(scoreSum.coherence / n),
-        },
-        avgScore: Math.round(totalScoreSum / n),
-        total: n,
-      };
+      }
+      return null;
+    },
+
+    remove: function(id) {
+      var arr = Notes.load().filter(function(n) { return n.id !== id; });
+      Notes.save(arr);
+    },
+
+    // 笔记总数
+    count: function() { return Notes.load().length; },
+  };
+
+  // ========================================================
+  //  OrganizeSession — 进行中的整理会话（刷新恢复用）
+  //  { active, stage, plan, sourceText, sourceMeta }
+  // ========================================================
+  var OrganizeSession = {
+    save: function(session) { _set(KEYS.ORGANIZE_SESSION, session); },
+    load: function() { return _get(KEYS.ORGANIZE_SESSION); },
+    clear: function() { _remove(KEYS.ORGANIZE_SESSION); },
+  };
+
+  // ========================================================
+  //  Reviews — 复盘记录（按笔记ID分组）
+  //  { noteId: { history: [{role, content}], reviewCount, lastReviewedAt } }
+  // ========================================================
+  var Reviews = {
+    _all: function() { return _get(KEYS.REVIEWS) || {}; },
+    _save: function(all) { _set(KEYS.REVIEWS, all); },
+
+    get: function(noteId) {
+      var all = Reviews._all();
+      return all[noteId] || { history: [], reviewCount: 0, lastReviewedAt: null };
+    },
+
+    saveHistory: function(noteId, history) {
+      var all = Reviews._all();
+      var rec = all[noteId] || { history: [], reviewCount: 0, lastReviewedAt: null };
+      rec.history = history;
+      all[noteId] = rec;
+      Reviews._save(all);
+    },
+
+    recordReview: function(noteId) {
+      var all = Reviews._all();
+      var rec = all[noteId] || { history: [], reviewCount: 0, lastReviewedAt: null };
+      rec.reviewCount = (rec.reviewCount || 0) + 1;
+      rec.lastReviewedAt = Date.now();
+      all[noteId] = rec;
+      Reviews._save(all);
+      return rec.reviewCount;
+    },
+
+    getHistory: function(noteId) { return Reviews.get(noteId).history; },
+
+    // 全部复盘总次数（统计用）
+    totalCount: function() {
+      var all = Reviews._all();
+      var total = 0;
+      Object.keys(all).forEach(function(k) { total += (all[k].reviewCount || 0); });
+      return total;
     },
   };
 
   // ========================================================
-  //  Recommend — 推荐记录
-  // ========================================================
-  var Recommend = {
-    // 保存一次推荐结果
-    save: function(recs) {
-      var record = {
-        recommendations: recs,
-        timestamp: Date.now(),
-        date: new Date().toISOString(),
-      };
-      _set(KEYS.RECOMMEND, record);
-      return record;
-    },
-
-    // 加载最近一次推荐
-    load: function() {
-      return _get(KEYS.RECOMMEND) || null;
-    },
-
-    // 获取推荐列表（快捷方法）
-    getRecommendations: function() {
-      var data = Recommend.load();
-      return data ? data.recommendations : [];
-    },
-
-    // 清空推荐记录
-    clear: function() { _remove(KEYS.RECOMMEND); },
-  };
-
-  // ========================================================
-  //  ForestRecommend — 森林页推荐记录
-  // ========================================================
-  var ForestRecommend = {
-    save: function(recs) {
-      var record = {
-        recommendations: recs,
-        timestamp: Date.now(),
-        date: new Date().toISOString(),
-      };
-      _set(KEYS.FOREST_RECOMMEND, record);
-      return record;
-    },
-
-    load: function() {
-      return _get(KEYS.FOREST_RECOMMEND) || null;
-    },
-
-    getRecommendations: function() {
-      var data = ForestRecommend.load();
-      return data ? data.recommendations : [];
-    },
-
-    // 判断缓存是否有效（24小时内）
-    isFresh: function() {
-      var data = ForestRecommend.load();
-      if (!data || !data.timestamp) return false;
-      return (Date.now() - data.timestamp) < 24 * 60 * 60 * 1000;
-    },
-
-    clear: function() { _remove(KEYS.FOREST_RECOMMEND); },
-  };
-
-  // ========================================================
-  //  Trash — 垃圾箱（已删除卡片，7天后自动清空）
+  //  Trash — 垃圾箱（已删除卡片/笔记，7天后自动清空）
   // ========================================================
   var Trash = {
     load: function() { return _get(KEYS.TRASH) || []; },
 
-    // 将卡片移入垃圾箱（标记deletedAt时间戳）
-    add: function(card) {
+    add: function(item) {
       var arr = Trash.load();
-      var trashed = Object.assign({}, card, { deletedAt: Date.now() });
+      var trashed = Object.assign({}, item, { deletedAt: Date.now(), itemType: item.itemType || 'card' });
       arr.push(trashed);
-      // 自动清空超过7天的
       arr = Trash._purgeOld(arr);
       _set(KEYS.TRASH, arr);
       return trashed;
     },
 
-    // 批量移入垃圾箱
-    addMany: function(cards) {
+    addMany: function(items) {
       var arr = Trash.load();
       var now = Date.now();
-      cards.forEach(function(card) {
-        arr.push(Object.assign({}, card, { deletedAt: now }));
+      items.forEach(function(item) {
+        arr.push(Object.assign({}, item, { deletedAt: now, itemType: item.itemType || 'card' }));
       });
       arr = Trash._purgeOld(arr);
       _set(KEYS.TRASH, arr);
     },
 
-    // 从垃圾箱恢复卡片到回响
     restore: function(id) {
       var arr = Trash.load();
-      var card = null;
+      var item = null;
       var rest = [];
       arr.forEach(function(c) {
-        if (c.id === id) { card = c; } else { rest.push(c); }
+        if (c.id === id) { item = c; } else { rest.push(c); }
       });
       _set(KEYS.TRASH, rest);
-      if (card) {
-        delete card.deletedAt;
-        return card;
+      if (item) {
+        delete item.deletedAt;
+        return item;
       }
       return null;
     },
 
-    // 永久删除
     permanentDelete: function(id) {
       var arr = Trash.load().filter(function(c) { return c.id !== id; });
       _set(KEYS.TRASH, arr);
     },
 
-    // 批量永久删除
-    permanentDeleteMany: function(ids) {
-      var idSet = {};
-      ids.forEach(function(id) { idSet[id] = true; });
-      var arr = Trash.load().filter(function(c) { return !idSet[c.id]; });
-      _set(KEYS.TRASH, arr);
-    },
-
-    // 清空垃圾箱
-    clearAll: function() { _remove(KEYS.TRASH); },
-
-    // 清除超过7天的条目
     _purgeOld: function(arr) {
       var cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
       return arr.filter(function(c) { return (c.deletedAt || 0) > cutoff; });
     },
 
-    // 获取清空后的列表（先清超期的再返回）
     loadPurged: function() {
       var arr = Trash.load();
       var purged = Trash._purgeOld(arr);
@@ -342,7 +270,7 @@ var Storage = (function() {
   };
 
   // ========================================================
-  //  CustomDomains — 用户自定义领域
+  //  CustomDomains — 用户自定义领域（知识点分类）
   // ========================================================
   var CustomDomains = {
     load: function() { return _get(KEYS.CUSTOM_DOMAINS) || []; },
@@ -360,31 +288,27 @@ var Storage = (function() {
   };
 
   // ========================================================
-  //  CardNotes — 用户笔记（按卡片ID存储）
+  //  CardNotes — 卡片上的用户笔记（按卡片ID存储）
   // ========================================================
   var CardNotes = {
-    // 获取某张卡片的笔记
     get: function(cardId) {
       var all = _get(KEYS.CARD_NOTES) || {};
       return all[cardId] || '';
     },
-    // 保存某张卡片的笔记
     save: function(cardId, note) {
       var all = _get(KEYS.CARD_NOTES) || {};
       if (note && note.trim()) {
         all[cardId] = note.trim();
       } else {
-        delete all[cardId]; // 空笔记删除key
+        delete all[cardId];
       }
       _set(KEYS.CARD_NOTES, all);
     },
-    // 删除某张卡片的笔记
     remove: function(cardId) {
       var all = _get(KEYS.CARD_NOTES) || {};
       delete all[cardId];
       _set(KEYS.CARD_NOTES, all);
     },
-    // 获取全部笔记（用于导出等）
     loadAll: function() { return _get(KEYS.CARD_NOTES) || {}; },
   };
 
@@ -400,7 +324,6 @@ var Storage = (function() {
         ts: Date.now(),
         date: new Date().toISOString().split('T')[0],
       });
-      // 只保留最近1000条
       if (events.length > 1000) events = events.slice(-1000);
       _set(KEYS.ANALYTICS, events);
     },
@@ -413,72 +336,19 @@ var Storage = (function() {
       return events;
     },
 
-    // 获取统计摘要
     getSummary: function() {
       var events = _get(KEYS.ANALYTICS) || [];
-      var chatEnds = events.filter(function(e) { return e.id === 'chat_end'; });
-      var cards = events.filter(function(e) { return e.id === 'card_generate'; });
-      var modeLight = events.filter(function(e) { return e.id === 'mode_switch' && e.data.to === 'light'; });
-      var modeDeep = events.filter(function(e) { return e.id === 'mode_switch' && e.data.to === 'deep'; });
-      var c01 = events.filter(function(e) { return e.id === 'trust_c01'; });
-      var c03 = events.filter(function(e) { return e.id === 'trust_c03'; });
-
+      var imports = events.filter(function(e) { return e.id === 'import'; });
+      var generated = events.filter(function(e) { return e.id === 'note_generated'; });
+      var reviews = events.filter(function(e) { return e.id === 'review_start'; });
       return {
-        totalChats: chatEnds.length,
-        totalCards: cards.length,
-        modeLight: modeLight.length,
-        modeDeep: modeDeep.length,
-        c01Triggers: c01.length,
-        c03Triggers: c03.length,
+        totalImports: imports.length,
+        totalNotes: generated.length,
+        totalReviews: reviews.length,
       };
     },
 
     clear: function() { _remove(KEYS.ANALYTICS); },
-  };
-
-  // ========================================================
-  //  Streak — 连续天数计算
-  // ========================================================
-  var Streak = {
-    // 记录今天的活跃
-    recordToday: function() {
-      var today = new Date().toISOString().split('T')[0];
-      var streak = _get('qisi2-streak') || { days: [], current: 0 };
-      if (!streak.days.includes(today)) {
-        streak.days.push(today);
-        // 只保留最近90天
-        if (streak.days.length > 90) streak.days = streak.days.slice(-90);
-      }
-      // 计算连续天数
-      streak.current = Streak._calcStreak(streak.days);
-      _set('qisi2-streak', streak);
-      return streak.current;
-    },
-
-    getCurrent: function() {
-      var streak = _get('qisi2-streak') || { days: [], current: 0 };
-      streak.current = Streak._calcStreak(streak.days);
-      return streak.current;
-    },
-
-    _calcStreak: function(days) {
-      if (!days || days.length === 0) return 0;
-      var sorted = days.slice().sort().reverse();
-      var today = new Date().toISOString().split('T')[0];
-      var count = 0;
-      var checkDate = new Date(today);
-
-      for (var i = 0; i < sorted.length; i++) {
-        var dateStr = checkDate.toISOString().split('T')[0];
-        if (sorted.includes(dateStr)) {
-          count++;
-          checkDate.setDate(checkDate.getDate() - 1);
-        } else {
-          break;
-        }
-      }
-      return count;
-    },
   };
 
   // ========================================================
@@ -492,13 +362,11 @@ var Storage = (function() {
     Onboarding: Onboarding,
     Theme: Theme,
     Analytics: Analytics,
-    Streak: Streak,
-    Evaluate: Evaluate,
-    RecentCards: RecentCards,
-    Recommend: Recommend,
-    ForestRecommend: ForestRecommend,
     Trash: Trash,
     CustomDomains: CustomDomains,
     CardNotes: CardNotes,
+    Notes: Notes,
+    OrganizeSession: OrganizeSession,
+    Reviews: Reviews,
   };
 })();

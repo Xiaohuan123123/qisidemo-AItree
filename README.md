@@ -1,123 +1,82 @@
-# 栖思 - AI 学习成长助手（Demo 2.0 PC版）
+# 栖思 · 笔记整理工具（Demo 2.0 PC版）
 
-> 🌳 面向大学生的长期学习成长 AI Agent
+> 📒 把小红书、公众号的碎片内容，整理成属于你的清爽笔记
 
 ## 🚀 快速开始
 
-### 1. 安装依赖
+### 1. 配置环境变量
+在项目根目录创建 `.env` 文件：
+
 ```bash
-npm install
+# 必填：对话/生成用模型（DeepSeek）
+DEEPSEEK_API_KEY=sk-xxx
+
+# 可选：截图识别用多模态模型（OpenAI 兼容接口，支持智谱GLM / 通义Qwen-VL / 豆包等）
+VISION_API_KEY=xxx
+VISION_BASE_URL=https://openai.zhipuai.cn/api/paas/v4
+VISION_MODEL=glm-4v-flash
 ```
 
-### 2. 配置环境变量
-复制 `.env.example` 为 `.env`，填入你的 API Key：
-```bash
-cp .env.example .env
-# 编辑 .env 文件，填入 DEEPSEEK_API_KEY
-```
-
-### 3. 启动开发服务器
+### 2. 启动
 ```bash
 node server.js
 ```
-
 访问 http://localhost:3001
 
-## ✨ 核心功能
+> 不配 `VISION_API_KEY` 也能用：文字粘贴、PDF、Word、Markdown 导入不受影响，仅截图识别不可用。
 
-### 🎯 对话系统
-- **轻聊模式**（随便聊聊）：轻松对话，快速获取建议
-- **深度模式**（深入思考）：追问式对话，引导深度思考
-- **流式输出**：实时显示 AI 回复
-- **认知等级**：L1-L5 标签显示思考深度
+## ✨ 核心流程
 
-### 🃏 知识卡片
-- **自动生成**：对话结束自动生成知识卡片
-- **手动提取**：点击按钮手动提取知识点
-- **三维筛选**：按领域、深度、时间筛选
-- **卡片详情**：触发问题、思考路径、顿悟、盲区
+### 📥 笔记输入
+- **截图导入**：小红书/公众号笔记截图（最多9张，可Ctrl+V粘贴），多模态模型OCR识别
+- **文件导入**：PDF / Word / Markdown / 纯文本，本地解析
+- **文字导入**：直接粘贴文字内容
 
-### 🌲 知识图谱
-- **D3.js 力导向图**：可视化知识结构
-- **自动建边**：AI 分析卡片关联，自动建立连接
-- **5 种边类型**：前置、深入、关联、对比、组成
-- **交互式**：拖拽、悬停、点击查看详情
+### 💬 需求确认（至多5轮）
+1. **识别确认**：AI展示摘要、要点、存疑处，用户确认或纠正
+2. **明确目的**：考前复习 / 搭建知识体系 / 输出分享 / 单纯存档
+3. **结构形式**：AI推荐2-3种形式（附排版预览），或自定义
+4. **风格深度**：详略程度 / 是否补充原文外知识 / 批注处理
+5. **方案回放**：结构化「整理方案单」逐条确认，可返回修改
 
-### 📝 评价系统
-- **4 维度评分**：思考深度、纯度、准确度、连贯性
-- **综合建议**：针对最弱维度的改进建议
-- **认知档案**：追踪学习成长轨迹
+> 任何阶段可发「跳过，直接整理」用默认方案直达生成。
 
-### 📚 叶脉笔记
-- **笔记系统**：创建、编辑、删除笔记
-- **AI 分析**：知识点提取、漏洞识别、学习建议
-- **笔记转卡片**：从笔记生成知识卡片
+### 📒 笔记输出
+- 生成 Markdown 结构化笔记，存入笔记库
+- 自动析出 1-5 个知识点卡片
+- 支持导出 `.md` 文件
 
-### 🎨 用户体验
-- **Onboarding**：7 步引导流程
-- **三套主题**：活力、晨曦、深邃
-- **响应式设计**：PC 端三栏布局
+### 🌿 复盘
+- 笔记详情页点「开始复盘」，基于笔记内容自由对话
+- 可提问查证、让AI展开讲解、抽问检验记忆
+- 复盘记录按笔记独立保存
 
 ## 📁 项目结构
 
 ```
 demo2pc/
-├── index.html          # 主页面
-├── css/style.css       # 样式文件
+├── index.html          # 主页面（整理 / 笔记库 / 知识点 / 我的）
+├── css/style.css       # 样式（三套主题）
 ├── js/
 │   ├── app.js          # 主控制器
-│   ├── chat.js         # 对话模块
-│   ├── evaluate.js     # 评价模块
-│   ├── graph.js        # 图谱建边
-│   ├── recommend.js    # 推荐模块
-│   ├── storage.js      # 存储层
-│   ├── trust.js        # 信任管理
-│   └── vein.js         # 叶脉笔记
-├── api/chat.js         # 后端 API
-├── server.js           # 本地开发服务器
+│   ├── chat.js         # 对话模块（整理/复盘/自由对话三会话）
+│   ├── organize.js     # 整理状态机（S0-S5需求确认流程）
+│   ├── notes.js        # 笔记库 + 笔记详情（Markdown渲染）
+│   └── storage.js      # 存储层（localStorage）
+├── api/
+│   ├── chat.js         # DeepSeek 对话/生成 API
+│   ├── vision.js       # 多模态截图识别 API
+│   └── prompts.js      # 全部 System Prompt（单一来源）
+├── server.js           # 本地开发服务器（端口3001）
 └── vercel.json         # Vercel 部署配置
 ```
 
 ## 🛠️ 技术栈
 
-- **前端**：原生 HTML/CSS/JavaScript
-- **图表**：D3.js
-- **后端**：Node.js + Express
-- **AI**：DeepSeek API
-- **部署**：Vercel / EdgeOne Pages
-
-## 📦 部署
-
-### Vercel 部署
-1. Fork 本仓库
-2. 登录 [Vercel](https://vercel.com)
-3. Import Git Repository
-4. 添加环境变量 `DEEPSEEK_API_KEY`
-5. 自动部署完成！
-
-### 本地开发
-```bash
-# 安装依赖
-npm install
-
-# 启动服务器
-node server.js
-
-# 访问 http://localhost:3001
-```
-
-## 📝 开发日志
-
-- ✅ Prompt Engineering 迭代：语气校准 + 追问规则
-- ✅ 流式输出 + 模式差异化 + Markdown 渲染
-- ✅ 知识图谱自动建边 + 用户自定义编辑
-- ✅ 叶脉功能：AI 学习笔记系统
-- ✅ 评价系统：4 维度量化评分
-- ✅ 推荐系统：补缺/深入/拓展
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
+- **前端**：原生 HTML/CSS/JavaScript + marked.js（Markdown渲染）
+- **后端**：Node.js 原生 http（零依赖）
+- **模型**：DeepSeek（对话/生成）+ OpenAI兼容多模态接口（截图OCR）
+- **部署**：Vercel Serverless Functions
 
 ## 📄 License
 
@@ -125,6 +84,5 @@ MIT License
 
 ---
 
-**开发者**：小欢  
-**邮箱**：836881606@qq.com  
+**开发者**：小欢
 **GitHub**：[Xiaohuan123123](https://github.com/Xiaohuan123123)

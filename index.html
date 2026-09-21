@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>栖思</title>
+<title>栖思 · 笔记整理</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 </head>
 <body>
 
@@ -18,26 +18,22 @@
       <div class="sidebar-logo">🌱</div>
       <div>
         <div class="sidebar-title">栖思</div>
-        <div class="sidebar-subtitle">AI 学习伙伴</div>
+        <div class="sidebar-subtitle">笔记整理伙伴</div>
       </div>
     </div>
 
     <nav class="sidebar-nav">
-      <button class="nav-item active" data-tab="growth">
-        <svg class="nav-icon-fill" viewBox="0 0 24 24"><path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.5.7 2.8 1.8 3.7L8 22h8l-1.3-11.8c1.1-.9 1.8-2.2 1.8-3.7C16.5 4 14.5 2 12 2z"/></svg>
-        生长
+      <button class="nav-item active" data-tab="organize">
+        <svg class="nav-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        整理
       </button>
-      <button class="nav-item" data-tab="echo">
-        <svg class="nav-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4.97 0-9 3.19-9 7.11 0 2.31 1.26 4.36 3.24 5.74L5 20l4.24-1.69c.89.26 1.83.4 2.76.4 4.97 0 9-3.19 9-7.11C21 6.19 16.97 3 12 3z"/></svg>
-        回响
+      <button class="nav-item" data-tab="notes">
+        <svg class="nav-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        笔记库
       </button>
-      <button class="nav-item" data-tab="tree">
-        <svg class="nav-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        树下
-      </button>
-      <button class="nav-item" data-tab="forest">
-        <svg class="nav-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L4 13h5l-3 8h12l-3-8h5z"/></svg>
-        森林
+      <button class="nav-item" data-tab="cards">
+        <svg class="nav-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        知识点
       </button>
       <button class="nav-item" data-tab="profile">
         <svg class="nav-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
@@ -49,7 +45,7 @@
       <div class="sidebar-avatar">🐻</div>
       <div class="sidebar-user-info">
         <div class="sidebar-user-name" id="sidebar-name">栖思用户</div>
-        <div class="sidebar-user-streak" id="sidebar-streak">连续思考 0 天</div>
+        <div class="sidebar-user-streak">碎片进来，笔记出去</div>
       </div>
     </div>
   </aside>
@@ -57,51 +53,42 @@
   <!-- ==================== 主内容区 ==================== -->
   <main class="main-content">
 
-    <!-- ===== 生长页（对话） ===== -->
-    <div class="page-section active" id="page-growth">
+    <!-- ===== 整理页（导入 + 需求对话） ===== -->
+    <div class="page-section active" id="page-organize">
       <div class="chat-main">
-        <!-- Empty State -->
+        <!-- Empty State：导入入口 -->
         <div class="empty-state" id="emptyState">
-          <div class="tree-scene">
-            <svg viewBox="0 0 200 220" width="120" height="132">
-              <ellipse cx="100" cy="200" rx="60" ry="12" fill="oklch(85% 0.02 85)" opacity=".3"/>
-              <rect x="95" y="120" width="10" height="80" rx="5" fill="oklch(55% 0.06 105)"/>
-              <circle cx="100" cy="80" r="55" fill="oklch(72% 0.08 120)" opacity=".6"/>
-              <circle cx="80" cy="90" r="35" fill="oklch(68% 0.10 115)" opacity=".5"/>
-              <circle cx="120" cy="85" r="30" fill="oklch(75% 0.07 125)" opacity=".5"/>
-              <circle cx="100" cy="65" r="25" fill="oklch(65% 0.12 110)" opacity=".4"/>
-            </svg>
-          </div>
           <div class="welcome-text">
-            今天想聊点什么？<br>
-            和我分享你最近学到的<br>
-            <span class="accent">一个概念、一个想法、一个困惑</span>
+            把碎片内容交给我 📥<br>
+            <span class="accent">截图、PDF、文字</span>，我帮你整理成笔记
           </div>
+          <div class="import-actions">
+            <button class="import-btn" onclick="document.getElementById('imgFileInput').click()">
+              🖼️📄 上传截图 / 文件
+            </button>
+            <button class="import-btn secondary" onclick="App.toggleTextImport()">
+              ✂️ 粘贴文字
+            </button>
+          </div>
+          <div class="text-import-box" id="textImportBox" style="display:none">
+            <textarea id="textImportArea" placeholder="把小红书/公众号的文字内容粘贴到这里..." rows="5"></textarea>
+            <button class="import-btn" onclick="App.confirmTextImport()">开始整理 →</button>
+          </div>
+          <div class="import-tips">支持：笔记截图（多张）· PDF · Word · Markdown · 纯文字</div>
         </div>
 
         <!-- Chat Area -->
         <div class="chat-area" id="chatArea">
           <div class="chat-messages" id="chatMessages"></div>
-          <div class="thinking-indicator" id="thinkingIndicator">
-            <div class="leaf-thinking">
-              <span class="leaf-icon">🍃</span>
-              <span class="thinking-text">栖思在想...</span>
-            </div>
-          </div>
         </div>
 
         <!-- Input -->
         <div class="input-section">
           <div class="mode-bar">
-            <div class="mode-tabs">
-              <button class="mode-tab" data-mode="light" onclick="Chat.switchMode('light')">🌱 随便聊聊</button>
-              <button class="mode-tab active" data-mode="deep" onclick="Chat.switchMode('deep')">🔍 深入思考</button>
-            </div>
             <div class="mode-actions">
-              <button class="mode-btn mode-btn-danger" onclick="App.confirmClearChat()">🗑️ 清空思考</button>
-              <button class="mode-btn" onclick="Chat.extractCards();this.classList.add('active');setTimeout(function(){this.classList.remove('active')}.bind(this),1500)">🃏 生成卡片</button>
-              <button class="mode-btn mode-btn-img" onclick="document.getElementById('imgFileInput').click()">📤 上传</button>
-              <input type="file" id="imgFileInput" accept="image/*,.md,.markdown,.doc,.docx,.pdf" multiple style="display:none">
+              <button class="mode-btn mode-btn-danger" onclick="App.confirmClearChat()">🗑️ 清空</button>
+              <button class="mode-btn mode-btn-img" onclick="document.getElementById('imgFileInput').click()">📤 上传截图/文件</button>
+              <input type="file" id="imgFileInput" accept="image/*,.md,.markdown,.txt,.doc,.docx,.pdf" multiple style="display:none">
             </div>
           </div>
           <!-- 统一输入容器 -->
@@ -112,7 +99,7 @@
             </div>
             <!-- 输入行 -->
             <div class="input-row">
-              <input type="text" class="input-field" id="inputField" placeholder="和我聊聊你今天学到了什么..." autocomplete="off">
+              <input type="text" class="input-field" id="inputField" placeholder="和我确认需求，或直接说「跳过，直接整理」..." autocomplete="off">
               <button class="send-btn" id="sendBtn" disabled>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
               </button>
@@ -121,29 +108,71 @@
         </div>
       </div>
 
-      <!-- 右侧面板：最新卡片 -->
+      <!-- 右侧面板：最新笔记 -->
       <aside class="right-panel">
         <div class="right-panel-header">
-          <span>最新卡片</span>
-          <div class="right-panel-actions">
-            <button class="panel-recommend-btn" onclick="App.triggerRecommend()" title="获取推荐">
-              🌿 推荐
-            </button>
-            <button class="panel-delete-btn" onclick="App.enterDeleteMode()" title="删除卡片">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-            </button>
-          </div>
+          <span>最新笔记</span>
         </div>
-        <div class="right-panel-content" id="rightPanelCards">
-          <div class="right-panel-empty">对话结束后<br>知识卡片会出现在这里 ✨</div>
+        <div class="right-panel-content" id="rightPanelNotes">
+          <div class="right-panel-empty">整理完成的笔记<br>会出现在这里 ✨</div>
         </div>
       </aside>
     </div>
 
-    <!-- ===== 回响页 ===== -->
-    <div class="page-section" id="page-echo">
+    <!-- ===== 笔记库页 ===== -->
+    <div class="page-section" id="page-notes">
       <div class="page-header">
-        <div class="page-title">回响</div>
+        <div class="page-title">📒 笔记库</div>
+        <div class="page-header-actions">
+          <button class="note-action-btn" onclick="Notes.exportAllNotes()">⬇️ 导出全部</button>
+        </div>
+      </div>
+      <div class="cards-container">
+        <div class="notes-grid" id="notesGrid">
+          <div class="empty-cards">还没有笔记 📒<br>去「整理」页导入第一份内容吧</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 笔记详情页 ===== -->
+    <div class="page-section" id="page-note-detail">
+      <div class="card-detail-header">
+        <button class="card-detail-back" onclick="App.switchTab('notes', true)">← 返回笔记库</button>
+        <div class="card-detail-meta">
+          <span class="note-detail-title" id="noteDetailTitle"></span>
+          <span class="card-detail-date" id="noteDetailMeta"></span>
+        </div>
+        <div class="note-detail-actions">
+          <button class="note-action-btn primary" onclick="Notes.startReviewCurrent()">🌿 开始复盘</button>
+          <button class="note-action-btn" onclick="Notes.exportMarkdown()">⬇️ 导出</button>
+          <button class="note-action-btn danger" onclick="Notes.deleteCurrent()">删除</button>
+        </div>
+      </div>
+      <div class="note-detail-body">
+        <div class="note-detail-main">
+          <div class="note-detail-plan" id="noteDetailPlan"></div>
+          <div class="markdown-body" id="noteDetailBody"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 笔记删除确认弹窗 ===== -->
+    <div class="confirm-overlay" id="noteDeleteOverlay">
+      <div class="confirm-modal">
+        <div class="confirm-icon">🗑️</div>
+        <div class="confirm-text">删除这份笔记？</div>
+        <div class="confirm-hint">笔记会移入垃圾箱，7天内可恢复；关联的知识点卡片不受影响</div>
+        <div class="confirm-actions">
+          <button class="confirm-cancel" onclick="Notes.closeDeleteConfirm()">取消</button>
+          <button class="confirm-ok" onclick="Notes.confirmDelete()">确认删除</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 知识点页 ===== -->
+    <div class="page-section" id="page-cards">
+      <div class="page-header">
+        <div class="page-title">🃏 知识点</div>
         <div class="page-header-actions">
           <button class="echo-trash-btn" onclick="App.openTrash()" title="垃圾箱">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -153,21 +182,8 @@
       </div>
       <div class="filter-bar" id="filterBar">
         <div class="filter-row">
-          <span class="filter-label">领域</span>
+          <span class="filter-label">主题</span>
           <div class="filter-chips" id="domainChips"></div>
-          <button class="domain-add-btn" onclick="App.promptAddDomain()" title="添加自定义领域">+</button>
-          <button class="domain-add-btn domain-del-btn" onclick="App.enterDomainDeleteMode()" title="删除领域">−</button>
-        </div>
-        <div class="filter-row">
-          <span class="filter-label">深度</span>
-          <div class="filter-chips" id="levelChips">
-            <button class="filter-chip active" data-level="all">全部</button>
-            <button class="filter-chip" data-level="1">L1</button>
-            <button class="filter-chip" data-level="2">L2</button>
-            <button class="filter-chip" data-level="3">L3</button>
-            <button class="filter-chip" data-level="4">L4</button>
-            <button class="filter-chip" data-level="5">L5</button>
-          </div>
           <span class="filter-divider"></span>
           <span class="filter-label">时间</span>
           <div class="filter-chips" id="timeChips">
@@ -185,7 +201,7 @@
       </div>
       <div class="cards-container">
         <div class="cards-grid" id="cardsGrid">
-          <div class="empty-cards">你的第一张卡片即将诞生 🌱</div>
+          <div class="empty-cards">还没有知识点卡片 🌱<br>整理笔记后会自动析出</div>
         </div>
       </div>
       <!-- 多选删除操作栏 -->
@@ -195,284 +211,16 @@
         </label>
         <div class="echo-delete-actions">
           <span class="echo-delete-count" id="echoDeleteCount">已选 0 张</span>
-          <button class="echo-classify-btn" onclick="App.openDomainPicker()">归类到…</button>
           <button class="echo-delete-confirm" onclick="App.confirmEchoDelete()">移到垃圾箱</button>
           <button class="echo-delete-cancel" onclick="App.cancelEchoDelete()">取消</button>
         </div>
       </div>
     </div>
 
-    <!-- ===== 垃圾箱弹窗 ===== -->
-    <div class="trash-overlay" id="trashOverlay">
-      <div class="trash-modal">
-        <div class="trash-header">
-          <div class="trash-title">🗑️ 垃圾箱</div>
-          <div class="trash-subtitle">卡片将在删除后 7 天自动清空</div>
-          <button class="trash-close" onclick="App.closeTrash()">✕</button>
-        </div>
-        <div class="trash-body" id="trashBody">
-          <div class="trash-empty">垃圾箱是空的 🌿</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== 自定义领域输入弹窗 ===== -->
-    <div class="domain-input-overlay" id="domainInputOverlay">
-      <div class="domain-input-modal">
-        <div class="domain-input-title">添加自定义领域</div>
-        <input type="text" id="domainInputField" placeholder="输入领域名称..." maxlength="10">
-        <div class="domain-input-actions">
-          <button class="domain-input-cancel" onclick="App.cancelAddDomain()">取消</button>
-          <button class="domain-input-confirm" onclick="App.confirmAddDomain()">确定</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== 领域选择弹窗（多选归类） ===== -->
-    <div class="domain-picker-overlay" id="domainPickerOverlay">
-      <div class="domain-picker-modal">
-        <div class="domain-picker-title">选择目标领域</div>
-        <div class="domain-picker-list" id="domainPickerList"></div>
-        <div class="domain-picker-actions">
-          <button class="domain-picker-cancel" onclick="App.closeDomainPicker()">取消</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== 删除领域确认弹窗 ===== -->
-    <div class="confirm-overlay" id="confirmOverlay">
-      <div class="confirm-modal">
-        <div class="confirm-icon">🗑️</div>
-        <div class="confirm-text">你希望删除这个领域分类吗？</div>
-        <div class="confirm-domain-name" id="confirmDomainName"></div>
-        <div class="confirm-hint">该领域下的卡片不会被删除，仅移除分类标签</div>
-        <div class="confirm-actions">
-          <button class="confirm-cancel" onclick="App.cancelDeleteDomain()">取消</button>
-          <button class="confirm-ok" onclick="App.confirmDeleteDomain()">确认删除</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== 树下页 ===== -->
-    <div class="page-section" id="page-tree">
-      <!-- 中间：知识图谱 -->
-      <div class="tree-graph-main">
-        <div class="tree-header">
-          <div class="tree-title">🌳 知识图谱</div>
-          <div class="tree-legend">
-            <span class="legend-item"><span class="legend-dot" style="background:#FF6B6B"></span>前置</span>
-            <span class="legend-item"><span class="legend-dot" style="background:#FF9F43"></span>深入</span>
-            <span class="legend-item"><span class="legend-dot" style="background:#54A0FF"></span>关联</span>
-            <span class="legend-item"><span class="legend-dot" style="background:#5F27CD"></span>对比</span>
-            <span class="legend-item"><span class="legend-dot" style="background:#1DD1A1"></span>组成</span>
-          </div>
-        </div>
-        <div class="graph-container" id="graphContainer">
-          <svg id="graphSvg"></svg>
-        </div>
-        <div class="graph-tooltip" id="graphTooltip"></div>
-        <div class="tree-stats">
-          <div class="tree-stat-item">
-            <div class="tree-stat-num" id="tree-node-count">0</div>
-            <div class="tree-stat-label">知识节点</div>
-          </div>
-          <div class="tree-stat-item">
-            <div class="tree-stat-num" id="tree-edge-count">0</div>
-            <div class="tree-stat-label">知识关联</div>
-          </div>
-          <div class="tree-stat-item">
-            <div class="tree-stat-num" id="tree-domain-count">0</div>
-            <div class="tree-stat-label">领域覆盖</div>
-          </div>
-        </div>
-      </div>
-      <!-- 右侧：栖思之树 -->
-      <div class="tree-right-panel">
-        <div class="tree-right-title">栖思之树</div>
-        <div class="tree-right-center">
-          <div class="tree-illustration">
-            <svg viewBox="0 0 200 260" width="140" height="182">
-              <ellipse cx="100" cy="245" rx="45" ry="8" fill="oklch(85% 0.02 85)" opacity=".3"/>
-              <rect x="96" y="140" width="8" height="105" rx="4" fill="oklch(55% 0.06 105)"/>
-              <circle cx="100" cy="90" r="55" fill="oklch(72% 0.08 120)" opacity=".5"/>
-              <circle cx="75" cy="100" r="32" fill="oklch(68% 0.10 115)" opacity=".4"/>
-              <circle cx="125" cy="95" r="30" fill="oklch(75% 0.07 125)" opacity=".4"/>
-              <circle cx="100" cy="72" r="24" fill="oklch(65% 0.12 110)" opacity=".35"/>
-            </svg>
-          </div>
-          <div class="tree-leaves-container" id="treeLeaves"></div>
-          <div class="tree-narrative" id="narrativeText">你的种子刚刚种下 🌱</div>
-          <div class="tree-right-stats">
-            <div class="tree-stat-item">
-              <div class="tree-stat-num" id="tree-streak">0</div>
-              <div class="tree-stat-label">连续天数</div>
-            </div>
-          </div>
-        </div>
-        <div class="tree-right-action">
-          <button class="fab-btn" onclick="App.switchTab('growth')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-            继续栖思
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== 森林页 ===== -->
-    <div class="page-section" id="page-forest">
-      <div class="forest-layout">
-        <!-- 左侧：AI 知识库 -->
-        <div class="forest-left">
-          <div class="forest-section-header">
-            <div class="forest-section-title">📚 AI 知识库</div>
-            <div class="forest-section-sub">随时回顾，按需探索</div>
-          </div>
-          <div class="forest-knowledge" id="forestKnowledge"></div>
-        </div>
-        <!-- 右侧：近日学习推荐 -->
-        <div class="forest-right">
-          <div class="forest-section-header">
-            <div class="forest-section-title">🌿 近日学习推荐</div>
-            <button class="forest-refresh-btn" onclick="App.refreshForestRecommend()" id="forestRefreshBtn">刷新推荐</button>
-          </div>
-          <div class="forest-recommend" id="forestRecommend">
-            <div class="forest-recommend-loading">正在为你规划学习方向...</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== 我的页 ===== -->
-    <div class="page-section" id="page-profile">
-      <div class="profile-scroll">
-        <div class="profile-scroll-inner">
-        <!-- 头部：头像 + 用户名 + 简介 -->
-        <div class="profile-header">
-          <div class="profile-avatar"><span>🐻</span></div>
-          <div class="profile-username" id="displayName">栖思用户</div>
-          <div class="profile-bio" id="profileBio">每天回答一个问题，种一棵只属于你的树</div>
-        </div>
-
-        <!-- 数据栏 -->
-        <div class="profile-stats">
-          <div class="profile-stat-item">
-            <div class="profile-stat-num" id="stat-chats">0</div>
-            <div class="profile-stat-label">对话</div>
-          </div>
-          <div class="profile-stat-item">
-            <div class="profile-stat-num" id="stat-cards">0</div>
-            <div class="profile-stat-label">卡片</div>
-          </div>
-          <div class="profile-stat-item">
-            <div class="profile-stat-num" id="streak-count">0</div>
-            <div class="profile-stat-label">连续天数</div>
-          </div>
-        </div>
-
-        <!-- Tab 栏 -->
-        <div class="profile-tabs">
-          <button class="profile-tab active" data-ptab="stats" onclick="App.switchProfileTab('stats')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-            学习统计
-          </button>
-          <button class="profile-tab" data-ptab="cog" onclick="App.switchProfileTab('cog')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg>
-            认知成长
-          </button>
-          <button class="profile-tab" data-ptab="info" onclick="App.switchProfileTab('info')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            个人信息
-          </button>
-          <button class="profile-tab" data-ptab="settings" onclick="App.switchProfileTab('settings')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 008.43 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 8.43a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 010 4h-.09c-.658.003-1.25.396-1.51 1z"/></svg>
-            设置
-          </button>
-        </div>
-
-        <!-- Tab 内容区 -->
-        <div class="profile-tab-content">
-          <!-- 学习统计 -->
-          <div class="profile-panel active" id="panel-stats">
-            <!-- 栖思之树的学习统计 -->
-            <div class="stat-panel">
-              <div class="stat-panel-title">🌳 栖思之树的学习统计</div>
-              <div id="statTreeComment" class="stat-tree-comment"></div>
-            </div>
-            <!-- 知识领域分布 -->
-            <div class="stat-panel">
-              <div class="stat-panel-title">📚 知识领域分布</div>
-              <div id="statDomainBars"></div>
-            </div>
-            <!-- 累计趋势 -->
-            <div class="stat-panel">
-              <div class="stat-panel-title">📈 近7天新增卡片</div>
-              <div id="statTrend"></div>
-            </div>
-            <!-- 认知等级分布 -->
-            <div class="stat-panel">
-              <div class="stat-panel-title">🧠 认知等级分布</div>
-              <div id="statLevelBars"></div>
-            </div>
-          </div>
-          <!-- 认知成长 -->
-          <div class="profile-panel" id="panel-cog">
-            <div id="cogProfileNew"></div>
-          </div>
-          <!-- 个人信息 -->
-          <div class="profile-panel" id="panel-info">
-            <div class="info-list">
-              <div class="info-item">
-                <div class="info-item-left"><div class="info-icon">🏫</div><span class="info-label">学校</span></div>
-                <div class="info-item-right"><span class="info-value" id="val-school">未填写</span></div>
-              </div>
-              <div class="info-item">
-                <div class="info-item-left"><div class="info-icon">📚</div><span class="info-label">专业</span></div>
-                <div class="info-item-right"><span class="info-value" id="val-major">未填写</span></div>
-              </div>
-              <div class="info-item">
-                <div class="info-item-left"><div class="info-icon">🎓</div><span class="info-label">年级</span></div>
-                <div class="info-item-right"><span class="info-value" id="val-grade">未填写</span></div>
-              </div>
-              <div class="info-item">
-                <div class="info-item-left"><div class="info-icon">📖</div><span class="info-label">课程</span></div>
-                <div class="info-item-right"><span class="info-value" id="val-courses">未填写</span></div>
-              </div>
-              <div class="info-item">
-                <div class="info-item-left"><div class="info-icon">🎯</div><span class="info-label">目标</span></div>
-                <div class="info-item-right"><span class="info-value" id="val-goals">未填写</span></div>
-              </div>
-              <div class="info-item">
-                <div class="info-item-left"><div class="info-icon">💬</div><span class="info-label">交互风格</span></div>
-                <div class="info-item-right"><span class="info-value" id="val-style">温和</span></div>
-              </div>
-            </div>
-          </div>
-          <!-- 设置 -->
-          <div class="profile-panel" id="panel-settings">
-            <div class="info-list">
-              <div class="info-item" onclick="App.switchTheme('')">
-                <div class="info-item-left"><div class="info-icon">🌿</div><span class="info-label">活力模式</span></div>
-                <div class="info-item-right"><span class="info-arrow">›</span></div>
-              </div>
-              <div class="info-item" onclick="App.switchTheme('theme-dawn')">
-                <div class="info-item-left"><div class="info-icon">🌸</div><span class="info-label">晨曦模式</span></div>
-                <div class="info-item-right"><span class="info-arrow">›</span></div>
-              </div>
-              <div class="info-item" onclick="App.switchTheme('theme-deep')">
-                <div class="info-item-left"><div class="info-icon">🌙</div><span class="info-label">深邃模式</span></div>
-                <div class="info-item-right"><span class="info-arrow">›</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        </div>
-      </div>
-    </div>
-
     <!-- ===== 卡片详情页 ===== -->
-    <div class="page-section" id="page-detail">
+    <div class="page-section" id="page-card-detail">
       <div class="card-detail-header">
-        <button class="card-detail-back" onclick="App.closeCardDetail()">← 返回</button>
+        <button class="card-detail-back" onclick="App.switchTab('cards', true)">← 返回</button>
         <div class="card-detail-meta">
           <span class="card-detail-domain" id="detailDomain"></span>
           <span class="card-detail-level" id="detailLevel"></span>
@@ -480,27 +228,18 @@
         </div>
       </div>
       <div class="card-detail-body">
-        <!-- 中间主区域 -->
         <div class="card-detail-main">
           <div class="detail-section">
-            <div class="detail-section-title">💬 触发问题</div>
+            <div class="detail-section-title">🏷️ 话题</div>
             <div class="detail-quote" id="detailTopic"></div>
           </div>
           <div class="detail-section">
-            <div class="detail-section-title" onclick="this.parentElement.classList.toggle('collapsed')">
-              🔗 思考路径 <span class="collapse-hint">点击折叠</span>
-            </div>
-            <div class="detail-timeline" id="detailTimeline"></div>
-          </div>
-          <div class="detail-section">
-            <div class="detail-section-title">💡 我的顿悟</div>
+            <div class="detail-section-title">💡 知识点内容</div>
             <div class="detail-insight" id="detailInsight">
-              <!-- 展示模式 -->
               <div class="insight-display" id="insightDisplay">
                 <div class="insight-text" id="insightText"></div>
                 <button class="note-edit-btn" onclick="App.editInsight()">编辑</button>
               </div>
-              <!-- 编辑模式 -->
               <div class="insight-editing" id="insightEditing" style="display:none">
                 <textarea class="insight-textarea" id="insightTextarea" rows="4"></textarea>
                 <div class="insight-actions">
@@ -516,14 +255,12 @@
           <div class="detail-section">
             <div class="detail-section-title">✏️ 我的笔记</div>
             <div class="detail-note-area" id="detailNoteArea">
-              <!-- 展示模式 -->
               <div class="note-display" id="noteDisplay">
                 <div class="note-text" id="noteText"></div>
                 <button class="note-edit-btn" id="noteEditBtn" onclick="App.editCardNote()">编辑</button>
               </div>
-              <!-- 编辑模式 -->
               <div class="note-editing" id="noteEditing" style="display:none">
-                <textarea class="note-textarea" id="noteTextarea" placeholder="写下你的思考、感悟、补充理解..." rows="4"></textarea>
+                <textarea class="note-textarea" id="noteTextarea" placeholder="写下你的想法、补充、疑问..." rows="4"></textarea>
                 <div class="note-actions">
                   <button class="note-cancel-btn" onclick="App.cancelCardNote()">取消</button>
                   <button class="note-save-btn" onclick="App.saveCardNote()">保存</button>
@@ -532,29 +269,14 @@
             </div>
           </div>
           <div class="detail-section">
-            <div class="detail-section-title">📎 知识锚点</div>
-            <div class="detail-anchors" id="detailAnchors"></div>
-          </div>
-          <div class="detail-section">
-            <div class="detail-section-title">🔍 盲区与下一步</div>
+            <div class="detail-section-title">🔍 易混点与延伸</div>
             <div class="detail-blindspot" id="detailBlindspot"></div>
           </div>
         </div>
-        <!-- 右侧边栏 -->
         <div class="card-detail-sidebar">
           <div class="sidebar-block">
-            <div class="sidebar-block-title">🏷️ 卡片类型</div>
-            <div class="sidebar-card-type" id="detailType">
-              <span class="type-icon">🧠</span>
-              <span class="type-label">思考型 Socratic</span>
-            </div>
-          </div>
-          <div class="sidebar-block">
-            <div class="sidebar-block-title">🌳 知识之树坐标</div>
-            <div class="sidebar-tree-path" id="detailTreePath">
-              <span>AI技术</span> <span class="path-sep">→</span>
-              <span id="detailDomainPath"></span>
-            </div>
+            <div class="sidebar-block-title">📒 来源笔记</div>
+            <div class="sidebar-source-note" id="detailSourceNote">—</div>
           </div>
           <div class="sidebar-block">
             <div class="sidebar-block-title">⭐ 掌握度</div>
@@ -563,12 +285,82 @@
           <div class="sidebar-block">
             <div class="sidebar-block-title">🔗 关联卡片</div>
             <div class="sidebar-related" id="detailRelated">
-              <div class="related-empty">知识图谱生成后显示</div>
+              <div class="related-empty">暂无关联卡片</div>
             </div>
           </div>
           <div class="sidebar-block">
             <div class="sidebar-block-title">🎯 实践任务</div>
             <div class="sidebar-action" id="detailAction"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 我的页 ===== -->
+    <div class="page-section" id="page-profile">
+      <div class="profile-scroll">
+        <div class="profile-scroll-inner">
+          <div class="profile-header">
+            <div class="profile-avatar"><span>🐻</span></div>
+            <div class="profile-username" id="displayName">栖思用户</div>
+            <div class="profile-bio">碎片进来，笔记出去</div>
+          </div>
+
+          <div class="profile-stats">
+            <div class="profile-stat-item">
+              <div class="profile-stat-num" id="stat-notes">0</div>
+              <div class="profile-stat-label">笔记</div>
+            </div>
+            <div class="profile-stat-item">
+              <div class="profile-stat-num" id="stat-cards">0</div>
+              <div class="profile-stat-label">知识点</div>
+            </div>
+            <div class="profile-stat-item">
+              <div class="profile-stat-num" id="stat-reviews">0</div>
+              <div class="profile-stat-label">复盘</div>
+            </div>
+          </div>
+
+          <div class="profile-tabs">
+            <button class="profile-tab active" data-ptab="info" onclick="App.switchProfileTab ? App.switchProfileTab('info') : null">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              个人信息
+            </button>
+            <button class="profile-tab" data-ptab="settings" onclick="App.switchProfileTab ? App.switchProfileTab('settings') : null">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 008.43 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 8.43a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 010 4h-.09c-.658.003-1.25.396-1.51 1z"/></svg>
+              设置
+            </button>
+          </div>
+
+          <div class="profile-tab-content">
+            <div class="profile-panel active" id="panel-info">
+              <div class="info-list">
+                <div class="info-item">
+                  <div class="info-item-left"><div class="info-icon">😊</div><span class="info-label">昵称</span></div>
+                  <div class="info-item-right"><span class="info-value" id="val-nickname">未填写</span></div>
+                </div>
+                <div class="info-item">
+                  <div class="info-item-left"><div class="info-icon">🎯</div><span class="info-label">默认整理目的</span></div>
+                  <div class="info-item-right"><span class="info-value" id="val-purpose">考前复习</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="profile-panel" id="panel-settings">
+              <div class="info-list">
+                <div class="info-item" onclick="App.switchTheme('')">
+                  <div class="info-item-left"><div class="info-icon">🌿</div><span class="info-label">活力模式</span></div>
+                  <div class="info-item-right"><span class="info-arrow">›</span></div>
+                </div>
+                <div class="info-item" onclick="App.switchTheme('theme-dawn')">
+                  <div class="info-item-left"><div class="info-icon">🌸</div><span class="info-label">晨曦模式</span></div>
+                  <div class="info-item-right"><span class="info-arrow">›</span></div>
+                </div>
+                <div class="info-item" onclick="App.switchTheme('theme-deep')">
+                  <div class="info-item-left"><div class="info-icon">🌙</div><span class="info-label">深邃模式</span></div>
+                  <div class="info-item-right"><span class="info-arrow">›</span></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -582,108 +374,65 @@
   <div class="onboarding-modal">
     <div class="ob-content">
       <div class="ob-title">欢迎来到栖思 🌱</div>
-      <div class="ob-subtitle">花 2 分钟告诉我一些关于你的信息，我会更懂你</div>
+      <div class="ob-subtitle">帮你把小红书、公众号的碎片内容整理成清爽笔记</div>
 
       <div class="ob-field">
         <label class="ob-label">怎么称呼你？</label>
         <input type="text" class="ob-input" id="ob-nickname" placeholder="昵称" maxlength="10">
       </div>
       <div class="ob-field">
-        <label class="ob-label">你的学校</label>
-        <input type="text" class="ob-input" id="ob-school" placeholder="如：南京大学">
-      </div>
-      <div class="ob-field">
-        <label class="ob-label">你的专业</label>
-        <input type="text" class="ob-input" id="ob-major" placeholder="如：计算机科学">
-      </div>
-      <div class="ob-field">
-        <label class="ob-label">你的年级</label>
-        <select class="ob-select" id="ob-grade">
-          <option value="">请选择</option>
-          <option value="大一">大一</option><option value="大二">大二</option>
-          <option value="大三">大三</option><option value="大四">大四</option>
-          <option value="研一">研一</option><option value="研二">研二</option><option value="研三">研三</option>
-        </select>
-      </div>
-      <div class="ob-field">
-        <label class="ob-label">你目前在学的课程（选 1-3 个）</label>
-        <div class="ob-chips" id="ob-courses">
-          <button class="ob-chip" onclick="this.classList.toggle('active')">AI基础</button>
-          <button class="ob-chip" onclick="this.classList.toggle('active')">机器学习</button>
-          <button class="ob-chip" onclick="this.classList.toggle('active')">深度学习</button>
-          <button class="ob-chip" onclick="this.classList.toggle('active')">NLP</button>
-          <button class="ob-chip" onclick="this.classList.toggle('active')">计算机视觉</button>
-          <button class="ob-chip" onclick="this.classList.toggle('active')">AIPM</button>
-          <button class="ob-chip" onclick="this.classList.toggle('active')">数据结构</button>
-          <button class="ob-chip" onclick="this.classList.toggle('active')">概率论</button>
-        </div>
-      </div>
-      <div class="ob-field">
-        <label class="ob-label">你的学习目标</label>
-        <select class="ob-select" id="ob-goals">
-          <option value="">请选择</option>
-          <option value="校招求职">校招求职</option>
-          <option value="考研保研">考研/保研</option>
-          <option value="个人兴趣">个人兴趣</option>
-          <option value="课程作业">课程作业</option>
-          <option value="转方向">准备转方向</option>
-        </select>
-      </div>
-      <div class="ob-field">
-        <label class="ob-label">你喜欢怎样的 AI 交互风格？</label>
-        <div class="ob-radio-group">
-          <label class="ob-radio-label"><input type="radio" name="ob-style" value="温和" checked>🌸 温和</label>
-          <label class="ob-radio-label"><input type="radio" name="ob-style" value="理性">🧠 理性</label>
-          <label class="ob-radio-label"><input type="radio" name="ob-style" value="活泼">⚡ 活泼</label>
-        </div>
-      </div>
-      <div class="ob-field">
-        <label class="ob-label">选一棵你的树</label>
-        <select class="ob-select" id="ob-tree">
-          <option value="银杏">🌿 银杏</option><option value="红枫">🍁 红枫</option>
-          <option value="松柏">🌲 松柏</option><option value="竹">🎋 竹</option>
-          <option value="樱花">🌸 樱花</option><option value="橡树">🌳 橡树</option>
-          <option value="胡杨">🏜️ 胡杨</option>
+        <label class="ob-label">你整理笔记通常是为了什么？（随时可改）</label>
+        <select class="ob-select" id="ob-purpose">
+          <option value="考前复习">📚 考前复习</option>
+          <option value="搭建知识体系">🧩 搭建知识体系</option>
+          <option value="输出分享">📢 输出分享</option>
+          <option value="单纯存档">🗄 单纯存档</option>
         </select>
       </div>
     </div>
     <div class="ob-btn-group">
       <button class="ob-btn ob-btn-secondary" onclick="App.skipOnboarding()">跳过</button>
-      <button class="ob-btn ob-btn-primary" onclick="App.completeOnboarding()">开始栖思 →</button>
+      <button class="ob-btn ob-btn-primary" onclick="App.completeOnboarding()">开始整理 →</button>
     </div>
   </div>
 </div>
 
-<script src="js/storage.js?v=3"></script>
-<script src="js/trust.js?v=3"></script>
-<script src="js/evaluate.js?v=3"></script>
-<script src="js/recommend.js?v=3"></script>
-<script src="js/chat.js?v=7"></script>
-<script src="js/app.js?v=3"></script>
+<!-- ==================== 垃圾箱弹窗 ==================== -->
+<div class="trash-overlay" id="trashOverlay">
+  <div class="trash-modal">
+    <div class="trash-header">
+      <div class="trash-title">🗑️ 垃圾箱</div>
+      <div class="trash-subtitle">删除的内容将在 7 天后自动清空</div>
+      <button class="trash-close" onclick="App.closeTrash()">✕</button>
+    </div>
+    <div class="trash-body" id="trashBody">
+      <div class="trash-empty">垃圾箱是空的 🌿</div>
+    </div>
+  </div>
+</div>
 
-<!-- ==================== 清空思考选择弹窗 ==================== -->
+<!-- ==================== 清空确认弹窗 ==================== -->
 <div class="clear-popup-overlay" id="clearPopup">
   <div class="clear-popup">
-    <div class="clear-popup-title">你想做什么？</div>
+    <div class="clear-popup-title">清空当前对话？</div>
     <div class="clear-popup-options">
-      <button class="clear-popup-btn" onclick="App.chooseNewTopic()">
-        <span class="clear-popup-icon">🌱</span>
-        <div>
-          <div class="clear-popup-btn-title">开启新话题</div>
-          <div class="clear-popup-btn-desc">保留之前的对话，换个方向聊</div>
-        </div>
-      </button>
-      <button class="clear-popup-btn" onclick="App.chooseClearAll()">
+      <button class="clear-popup-btn" onclick="App.doClearChat()">
         <span class="clear-popup-icon">🗑️</span>
         <div>
-          <div class="clear-popup-btn-title">清空所有思考</div>
-          <div class="clear-popup-btn-desc">删除本次对话，从头开始</div>
+          <div class="clear-popup-btn-title">清空并重新开始</div>
+          <div class="clear-popup-btn-desc">删除当前对话，从导入新内容开始</div>
         </div>
       </button>
     </div>
     <button class="clear-popup-cancel" onclick="App.closeClearPopup()">取消</button>
   </div>
 </div>
+
+<script src="js/storage.js?v=1"></script>
+<script src="js/organize.js?v=1"></script>
+<script src="js/notes.js?v=1"></script>
+<script src="js/chat.js?v=1"></script>
+<script src="js/app.js?v=1"></script>
 
 </body>
 </html>
