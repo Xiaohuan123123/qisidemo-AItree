@@ -50,6 +50,10 @@ var Notes = (function() {
           '<span>' + dateStr + '</span>' +
           (note.cardIds && note.cardIds.length ? '<span>🃏 ' + note.cardIds.length + ' 个知识点</span>' : '') +
           (note.reviewCount ? '<span>🔁 复盘 ' + note.reviewCount + ' 次</span>' : '') +
+        '</div>' +
+        '<div class="note-card-footer">' +
+          Feishu.syncButtonHTML(note.id, 'feishu-btn-sm') +
+          Feishu.syncBadgeHTML(note) +
         '</div>';
 
       // 导出按钮（阻止冒泡，避免触发卡片点击）
@@ -92,20 +96,44 @@ var Notes = (function() {
       }).join('');
     }
 
+    // 飞书同步按钮 + 已同步标记
+    _renderFeishuBar(note);
+
     // Markdown 正文
     var body = document.getElementById('noteDetailBody');
     if (body) {
-      if (typeof marked !== 'undefined') {
-        try {
-          marked.setOptions ? marked.setOptions({ breaks: true }) : null;
-          body.innerHTML = marked.parse(note.markdown || '*（空笔记）*');
-        } catch (e) {
-          body.textContent = note.markdown || '';
-        }
-      } else {
-        body.textContent = note.markdown || '';
-      }
+      body.innerHTML = renderMarkdown(note.markdown);
     }
+  }
+
+  function _renderFeishuBar(note) {
+    var host = document.getElementById('noteDetailFeishu');
+    if (!host) return;
+    host.innerHTML = Feishu.syncButtonHTML(note.id) + ' ' + Feishu.syncBadgeHTML(note);
+  }
+
+  /**
+   * 渲染 Markdown → 安全 HTML
+   * 笔记内容来自 LLM（可能原样保留用户粘贴的原始 HTML），
+   * 直接 innerHTML 会让 <img onerror=...> 这类 payload 在打开笔记时执行，
+   * 因此必须经 DOMPurify 净化后再插入。
+   */
+  function renderMarkdown(md) {
+    var source = md || '*（空笔记）*';
+    if (typeof marked === 'undefined') return _esc(source);
+    var html;
+    try {
+      if (marked.setOptions) marked.setOptions({ breaks: true });
+      html = marked.parse(source);
+    } catch (e) {
+      return _esc(source);
+    }
+    if (typeof DOMPurify !== 'undefined') {
+      return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+    }
+    // DOMPurify 未加载（CDN 失败）时降级为纯文本，绝不直接插入未净化 HTML
+    console.warn('[Notes] DOMPurify 未加载，降级为纯文本渲染');
+    return _esc(source);
   }
 
   function closeDetail() {

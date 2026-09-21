@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 </head>
 <body>
 
@@ -143,6 +144,7 @@
           <span class="card-detail-date" id="noteDetailMeta"></span>
         </div>
         <div class="note-detail-actions">
+          <span id="noteDetailFeishu"></span>
           <button class="note-action-btn primary" onclick="Notes.startReviewCurrent()">🌿 开始复盘</button>
           <button class="note-action-btn" onclick="Notes.exportMarkdown()">⬇️ 导出</button>
           <button class="note-action-btn danger" onclick="Notes.deleteCurrent()">删除</button>
@@ -347,6 +349,28 @@
             </div>
             <div class="profile-panel" id="panel-settings">
               <div class="info-list">
+                <div class="info-item feishu-setting">
+                  <div class="info-item-left">
+                    <div class="info-icon">📄</div>
+                    <div>
+                      <span class="info-label">连接飞书账号</span>
+                      <div class="feishu-setting-hint" id="feishuAccountHint"></div>
+                    </div>
+                  </div>
+                  <div class="info-item-right" id="feishuAccountAction"></div>
+                </div>
+                <div class="info-item">
+                  <div class="info-item-left">
+                    <div class="info-icon">🔄</div>
+                    <div>
+                      <span class="info-label">自动同步到飞书</span>
+                      <div class="feishu-setting-hint">新笔记生成后自动同步（需先连接账号）</div>
+                    </div>
+                  </div>
+                  <div class="info-item-right">
+                    <button class="feishu-toggle" id="autoSyncToggle" onclick="App.toggleAutoSync()">关闭</button>
+                  </div>
+                </div>
                 <div class="info-item" onclick="App.switchTheme('')">
                   <div class="info-item-left"><div class="info-icon">🌿</div><span class="info-label">活力模式</span></div>
                   <div class="info-item-right"><span class="info-arrow">›</span></div>
@@ -429,6 +453,7 @@
 </div>
 
 <script src="js/storage.js?v=1"></script>
+<script src="js/feishu.js?v=1"></script>
 <script src="js/organize.js?v=1"></script>
 <script src="js/notes.js?v=1"></script>
 <script src="js/chat.js?v=1"></script>

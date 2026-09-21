@@ -1647,3 +1647,65 @@ html, body {
   font-size: 13px; color: var(--text-secondary);
   background: var(--active-bg); border-radius: 10px; padding: 10px 12px;
 }
+
+/* ===== 飞书同步 ===== */
+.feishu-btn {
+  padding: 7px 16px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-size: 13px; font-weight: 500; color: var(--text-secondary);
+  font-family: inherit; cursor: pointer; transition: all 0.15s;
+  white-space: nowrap;
+}
+.feishu-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.feishu-btn:disabled { opacity: 0.6; cursor: default; }
+.feishu-btn-sm { padding: 4px 12px; font-size: 12px; border-radius: 8px; }
+
+.feishu-badge {
+  display: inline-flex; align-items: center;
+  padding: 5px 12px; border-radius: 9999px;
+  font-size: 12px; font-weight: 500; text-decoration: none;
+  background: oklch(93% 0.04 155); color: oklch(45% 0.09 155);
+  transition: filter 0.15s;
+}
+.feishu-badge:hover { filter: brightness(0.96); }
+
+.note-card-footer {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 8px; margin-top: 2px;
+  border-top: 1px dashed var(--border-light);
+}
+
+/* 弹窗被拦截时的保底手动授权入口 */
+.feishu-manual-auth {
+  position: fixed; bottom: 28px; right: 28px; z-index: 400;
+  width: 340px; padding: 18px 20px;
+  background: var(--surface); border: 1.5px solid var(--primary);
+  border-radius: 16px; box-shadow: 0 8px 30px oklch(0% 0 0 / 0.16);
+}
+.feishu-manual-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.feishu-manual-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+.feishu-manual-link {
+  display: block; margin-top: 12px; padding: 10px 14px;
+  background: var(--primary); color: #fff; text-align: center;
+  border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 600;
+}
+.feishu-manual-link:hover { filter: brightness(1.08); }
+.feishu-manual-close {
+  margin-top: 8px; width: 100%; padding: 7px;
+  border: none; background: none; cursor: pointer;
+  font-size: 12px; color: var(--text-muted); font-family: inherit;
+}
+.feishu-manual-close:hover { color: var(--text-primary); }
+
+.feishu-setting-hint { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.feishu-toggle {
+  padding: 5px 16px; border-radius: 9999px;
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-size: 12px; font-weight: 500; color: var(--text-secondary);
+  font-family: inherit; cursor: pointer; transition: all 0.15s;
+}
+.feishu-toggle:hover { border-color: var(--primary); color: var(--primary); }
+.feishu-toggle.on {
+  background: var(--primary); color: #fff; border-color: var(--primary);
+}
+.feishu-setting .info-item-left { align-items: flex-start; }

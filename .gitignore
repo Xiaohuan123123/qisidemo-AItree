@@ -3,3 +3,8 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# 飞书 OAuth 凭证（含 refresh_token，泄露 = 长期接管用户云空间）
+.feishu-token.json
+.feishu-*
+*feishu*token*

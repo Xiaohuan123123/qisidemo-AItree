@@ -490,6 +490,9 @@ var Organize = (function() {
     _renderResult(note, cards);
     _clear();
     document.dispatchEvent(new CustomEvent('note:generated', { detail: { note: note, cards: cards } }));
+
+    // 自动同步到飞书（开关开启时才生效；未授权时静默跳过，绝不弹窗）
+    Feishu.autoSync(note.id);
   }
 
   async function _extractCards(markdown) {
@@ -509,6 +512,7 @@ var Organize = (function() {
     html += '<div class="note-result-actions">';
     html += '<button class="note-result-btn" data-action="view">查看笔记</button>';
     html += '<button class="note-result-btn" data-action="export">⬇️ 导出</button>';
+    html += '<button class="note-result-btn secondary" data-action="feishu">📄 同步到飞书</button>';
     html += '<button class="note-result-btn" data-action="review">开始复盘</button>';
     html += '<button class="note-result-btn secondary" data-action="again">再整理一份</button>';
     html += '</div>';
@@ -521,6 +525,7 @@ var Organize = (function() {
           var action = this.dataset.action;
           if (action === 'view') App.openNoteDetail(note.id);
           else if (action === 'export') Notes.exportNoteById(note.id);
+          else if (action === 'feishu') Feishu.syncNote(note.id, { force: false });
           else if (action === 'review') App.startReview(note.id);
           else if (action === 'again') App.resetOrganize();
         });

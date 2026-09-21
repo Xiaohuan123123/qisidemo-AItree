@@ -22,6 +22,15 @@ var App = (function() {
     document.addEventListener('note:generated', _refreshAll);
     document.addEventListener('note:updated', _refreshAll);
 
+    // 飞书同步完成后：刷新笔记列表 + 当前详情页（_refreshAll 不含详情页）
+    document.addEventListener('feishu:synced', function(e) {
+      _refreshAll();
+      var noteId = e.detail && e.detail.noteId;
+      if (noteId && currentTab === 'note-detail' && Notes.getCurrentId() === noteId) {
+        Notes.openDetail(noteId);
+      }
+    });
+
     var theme = Storage.Theme.get();
     if (theme) document.body.className = theme;
 
@@ -513,7 +522,76 @@ var App = (function() {
     Storage.Theme.set(t);
   }
 
+  // ===== 飞书同步设置 =====
+  function _renderFeishuSetting() {
+    var hint = document.getElementById('feishuAccountHint');
+    var action = document.getElementById('feishuAccountAction');
+    var toggle = document.getElementById('autoSyncToggle');
+    if (!hint || !action) return;
+
+    // 先按本地已知状态渲染，再异步校正
+    hint.textContent = '检查中…';
+    action.innerHTML = '';
+    if (toggle) {
+      var on = Feishu.isAutoSyncOn();
+      toggle.textContent = on ? '开启' : '关闭';
+      toggle.classList.toggle('on', on);
+    }
+
+    Feishu.checkStatus().then(function(st) {
+      if (st.error || st.code === 'NOT_CONFIGURED') {
+        hint.textContent = '尚未配置：请在 .env 设置 FEISHU_APP_ID / FEISHU_APP_SECRET';
+        action.innerHTML = '';
+        return;
+      }
+      if (st.authorized) {
+        hint.textContent = '已连接' + (st.hint ? '（' + st.hint + '）' : '') + '，笔记可同步到你的飞书云空间';
+        action.innerHTML = '<button class="feishu-toggle" onclick="App.feishuLogout()">断开</button>';
+      } else {
+        hint.textContent = '未连接，同步前需要授权一次';
+        action.innerHTML = '<button class="feishu-toggle on" onclick="App.feishuAuthorize()">连接</button>';
+      }
+    });
+  }
+
+  function feishuAuthorize() {
+    Feishu.openAuthWindow();
+  }
+
+  function feishuLogout() {
+    fetch('/api/feishu?action=logout', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+      .then(function() {
+        Feishu.invalidateStatus();
+        _renderFeishuSetting();
+        _showToast('已断开飞书账号');
+      });
+  }
+
+  function toggleAutoSync() {
+    var next = !Feishu.isAutoSyncOn();
+    Feishu.setAutoSync(next);
+    var toggle = document.getElementById('autoSyncToggle');
+    if (toggle) {
+      toggle.textContent = next ? '开启' : '关闭';
+      toggle.classList.toggle('on', next);
+    }
+    if (next) {
+      // 开启时若未授权，当场引导（而不是等用户下次生成完才发现）
+      Feishu.checkStatus(true).then(function(st) {
+        if (st && st.authorized) {
+          _showToast('已开启自动同步');
+        } else {
+          _showToast('请先连接飞书账号');
+          feishuAuthorize();
+        }
+      });
+    } else {
+      _showToast('已关闭自动同步');
+    }
+  }
+
   function switchProfileTab(ptab) {
+    if (ptab === 'settings') _renderFeishuSetting();
     document.querySelectorAll('.profile-tab').forEach(function(t) {
       t.classList.toggle('active', t.dataset.ptab === ptab);
     });
@@ -680,6 +758,10 @@ var App = (function() {
     // 其他
     switchTheme: switchTheme,
     switchProfileTab: switchProfileTab,
+    // 飞书同步
+    feishuAuthorize: feishuAuthorize,
+    feishuLogout: feishuLogout,
+    toggleAutoSync: toggleAutoSync,
     confirmClearChat: confirmClearChat,
     closeClearPopup: closeClearPopup,
     doClearChat: doClearChat,
